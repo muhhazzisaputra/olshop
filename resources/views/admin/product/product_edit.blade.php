@@ -233,12 +233,12 @@
                     </div>
                     <div class="tab-pane fade{{ $variantShowActive }}" id="custom-tabs-three-messages" role="tabpanel" aria-labelledby="custom-tabs-three-messages-tab">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-5">
                                 <form action="/admin/product/storeVariant" method="post">
                                 @csrf
                                 <input type="hidden" name="product_id" value="{{ $product->id }}">
                                 <div class="form-group row">
-                                    <label for="size_id" class="col-sm-3 col-form-label">Ukuran<span style="color: red;">*</span></label>
+                                    <label for="size_id" class="col-sm-3 col-form-label">Ukuran <span style="color: red;">*</span></label>
                                     <div class="col-sm-9">
                                         <select class="form-control" name="size_id" id="size_id" required>
                                         @foreach($sizes as $size)
@@ -252,7 +252,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="stock_variant" class="col-sm-3 col-form-label">Stok Varian<span style="color: red;">*</span></label>
+                                    <label for="stock_variant" class="col-sm-3 col-form-label">Stok Varian <span style="color: red;">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="number" class="form-control @error('stock') is-invalid @enderror" name="stock_variant" id="stock_variant" placeholder="Stok Varian" value="{{ old('stock') }}" required>
                                         @error('stock')
@@ -291,7 +291,7 @@
                                 </div>
                                 </form>
                             </div>
-                            <div class="col-md-8">  
+                            <div class="col-md-7">  
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-striped">
                                         <thead>
@@ -313,9 +313,8 @@
                                                 <td>{{ $variant->purchase_price }}</td>
                                                 <td>{{ $variant->selling_price }}</td>
                                                 <td class="project-actions text-center">
-                                                    <button class="btn btn-info btn-xs" onclick="show({{ $size->id }})"><i class="fas fa-pencil-alt"></i> Edit</button>
-                                                    <a href=""></a>
-                                                    <button class="btn btn-danger btn-xs" onclick="destroy({{ $size->id }})"><i class="fas fa-trash"></i> Hapus</button>
+                                                    <button class="btn btn-info btn-xs varedit" value="{{$variant->id}}" data-toggle="modal" data-target="#variant-edit"><i class="fas fa-pencil-alt"></i> Edit</button>
+                                                    <a href="/admin/product/deleteVariant/{{$variant->id}}" class="btn btn-danger btn-xs" onclick="return confirm('Yakin ingin menghapus data?')"><i class="fas fa-trash"></i> Hapus</a>
                                                 </td>
                                             </tr>
                                             @endforeach
@@ -331,6 +330,57 @@
     </div>
 </section>
 
+<div class="modal fade" id="variant-edit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Varian</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/admin/product/storeVariant" method="post">
+                <div class="modal-body">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <div class="form-group row">
+                        <label for="size_id" class="col-sm-3 col-form-label">Ukuran <span style="color: red;">*</span></label>
+                        <div class="col-sm-9">
+                            <select class="form-control" name="size_id" id="size_id" required>
+                            @foreach($sizes as $size)
+                                <option value="{{ $size->id }}">{{ $size->name }}</option>
+                            @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="stock_variant_edit" class="col-sm-3 col-form-label">Stok Varian <span style="color: red;">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" name="stock_variant" id="stock_variant_edit" placeholder="Stok Varian" min="1" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="purchase_price_variant_edit" class="col-sm-3 col-form-label">Harga Beli <span style="color: red;">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" name="purchase_price_variant" id="purchase_price_variant_edit" placeholder="Harga Beli" min="1" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="selling_price_variant_edit" class="col-sm-3 col-form-label">Harga Jual <span style="color: red;">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" name="selling_price_variant" id="selling_price_variant_edit" placeholder="Harga Jual" min="1" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Update Data Varian</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     const name = document.querySelector('#name');
     const slug = document.querySelector('#slug');
@@ -343,6 +393,20 @@
 
     document.addEventListener('trix-file-accept', function(e) {
         e.preventDefault();
+    });
+
+    $(document).ready(function() {
+
+        $(document).on('click', '.varedit', function() {
+            var id = $(this).val();
+            $.get("{{ url('/admin/product/showVariant') }}/" + id, {}, function(result) {
+                var data = JSON.parse(result);
+                $('#stock_variant_edit').val(data.stock);
+                $('#purchase_price_variant_edit').val(data.purchase_price);
+                $('#selling_price_variant_edit').val(data.selling_price);
+            });
+        });
+
     });
 </script>
 

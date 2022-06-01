@@ -169,7 +169,7 @@ class AdminProductController extends Controller
         Storage::delete($productImage->image_gallery);
         Storage::delete($productImage->thumbnail);
 
-        productImage::destroy($id);
+        ProductImage::destroy($id);
 
         $product = Product::find($productImage->product_id);
 
@@ -191,6 +191,24 @@ class AdminProductController extends Controller
         ProductVariant::create($data);
 
         return redirect('/admin/product/'.$product->slug.'/edit')->with('variant', 'Data varian berhasil disimpan.');
+    }
+
+    public function showVariant($id)
+    {
+        $variant = ProductVariant::find($id);
+
+        return json_encode($variant);
+    }
+
+    public function deleteVariant($id)
+    {
+        $variant = ProductVariant::find($id);
+
+        ProductVariant::destroy($id);
+
+        $product = Product::find($variant->product_id);
+
+        return redirect('/admin/product/'.$product->slug.'/edit')->with('variant', 'Data varian berhasil dihapus.');
     }
 
 }

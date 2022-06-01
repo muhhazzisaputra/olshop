@@ -118,6 +118,8 @@ Route::resource('/admin/product', AdminProductController::class)->middleware('au
 Route::post('/admin/product/upload', [AdminProductController::class, 'uploadImage'])->middleware('auth');
 Route::get('/admin/product/deleteImage/{id}', [AdminProductController::class, 'deleteImage'])->middleware('auth');
 Route::post('/admin/product/storeVariant', [AdminProductController::class, 'storeVariant'])->middleware('auth');
+Route::get('/admin/product/showVariant/{id}', [AdminProductController::class, 'showVariant'])->middleware('auth');
+Route::get('/admin/product/deleteVariant/{id}', [AdminProductController::class, 'deleteVariant'])->middleware('auth');
 
 Route::get('/image-intervention', [ImageUploadController::class, 'index']);
 Route::post('/upload', [ImageUploadController::class, 'upload']);
